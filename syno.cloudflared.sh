@@ -2,7 +2,10 @@
 # shellcheck disable=SC2154,SC2181
 # shellcheck source=/dev/null
 #
-# A script to automagically update Plex Media Server on Synology NAS
+# A script to automagically update cloudlfared on Synology NAS from the builds at
+# https://github.com/karasevm/syno-cloudflared-builds. These builds are eventually published in the
+# SynoCommunity Package Center but this script allows for more frequent updates.
+#
 # This must be run as root to natively control running services
 #
 # Author @paulgit https://github.com/paulgit/syno.cloudflaredupdate
@@ -11,7 +14,7 @@
 # an original update concept based on: https://github.com/martinorob/plexupdate
 #
 # Example Synology DSM Scheduled Task type 'user-defined script': 
-# bash /volume1/homes/admin/scripts/bash/plex/syno.cloudflaredupdate.sh
+# bash /volume1/homes/admin/scripts/bash/syno.cloudflaredupdate.sh
 
 # Function to compare two version strings
 # Returns 0 if equal, 1 if v1 > v2, 2 if v1 < v2
@@ -59,13 +62,13 @@ main() {
   MinDSMVers=7.2
   # PRINT OUR GLORIOUS HEADER BECAUSE WE ARE FULL OF OURSELVES
   printf "\n"
-  printf "%s\n" "SYNO.PLEX UPDATE SCRIPT v$SpuscrpVer for DSM 7"
+  printf "%s\n" "SYNO.CLOUDFLARED UPDATE SCRIPT v$SpuscrpVer for DSM 7"
   printf "\n"
 
   # CHECK IF ROOT
   if [ "$EUID" -ne "0" ]; then
     printf ' %s\n\n' "* This script MUST be run as root - exiting.."
-    /usr/syno/bin/synonotify PKGHasUpgrade '{"%PKG_HAS_UPDATE%": "Plex Media Server\n\nSyno.Plex Update task failed. Script was not run as root."}'
+    /usr/syno/bin/synonotify PKGHasUpgrade '{"%PKG_HAS_UPDATE%": "cloudflared\n\nSyno.cloudflared Update task failed. Script was not run as root."}'
     printf "\n"
     exit 1
   fi
@@ -120,7 +123,7 @@ main() {
   # OVERRIDE SETTINGS WITH CLI OPTIONS
   while getopts ":a:c:mh" opt; do
     case ${opt} in
-      a) # AUTO-UPDATE SCRIPT AND PLEX
+      a) # AUTO-UPDATE SCRIPT AND CLOUDFLARED
         # Check if the value is numerical only
         if [[ $OPTARG =~ ^[0-9]+$ ]]; then
           MinimumAge=$OPTARG
@@ -257,7 +260,7 @@ main() {
             cmp -s   "$SrceFolder/Archive/Scripts/$SrceFileNm.cmp" "$SrceFolder/$SrceFileNm"
             if [ "$?" -eq "0" ]; then
               printf '%17s%s\n' '' "* Script update succeeded!"
-              /usr/syno/bin/synonotify PKGHasUpgrade '{"%PKG_HAS_UPDATE%": "Syno.Plex Update\n\nSelf-Update completed successfully"}'
+              /usr/syno/bin/synonotify PKGHasUpgrade '{"%PKG_HAS_UPDATE%": "Syno.cloudflared Update\n\nSelf-Update completed successfully"}'
               ExitStatus=1
               if [ -n "$SpusRelDes" ]; then
                 # SHOW RELEASE NOTES
@@ -270,12 +273,12 @@ main() {
               fi
             else
               printf '%17s%s\n' '' "* Script update failed to overwrite."
-              /usr/syno/bin/synonotify PKGHasUpgrade '{"%PKG_HAS_UPDATE%": "Syno.Plex Update\n\nSelf-Update failed."}'
+              /usr/syno/bin/synonotify PKGHasUpgrade '{"%PKG_HAS_UPDATE%": "Syno.cloudflared Update\n\nSelf-Update failed."}'
               ExitStatus=1
             fi
           else
             printf '%17s%s\n' '' "* Script update failed to download."
-            /usr/syno/bin/synonotify PKGHasUpgrade '{"%PKG_HAS_UPDATE%": "Syno.Plex Update\n\nSelf-Update failed to download."}'
+            /usr/syno/bin/synonotify PKGHasUpgrade '{"%PKG_HAS_UPDATE%": "Syno.cloudflared Update\n\nSelf-Update failed to download."}'
             ExitStatus=1
           fi
         else
@@ -374,7 +377,7 @@ main() {
     printf '%16s %s\n'    "Package Age:" "$LATEST_PKG_AGE+ days old ($MinimumAge+ required for install)"
     printf "\n"
 
-    # DOWNLOAD AND INSTALL THE PLEX UPDATE
+    # DOWNLOAD AND INSTALL THE CLOUDFLARED UPDATE
     if [ "$LATEST_PKG_AGE" -ge "$MinimumAge" ]; then
       printf "%s\n" "INSTALLING NEW PACKAGE:"
       printf "%s\n" "----------------------------------------"
@@ -412,7 +415,7 @@ main() {
       printf '%16s %s\n'  "Update from:" "$RunVersion"
       printf '%16s %s'             "to:" "$LATEST_PKG_VERSION"
 
-      # REPORT PLEX UPDATE STATUS
+      # REPORT CLOUDFLARED UPDATE STATUS
       if version_compare "$NowVersion" "$RunVersion"; then
         printf ' %s\n' "succeeded!"
         printf "\n"
