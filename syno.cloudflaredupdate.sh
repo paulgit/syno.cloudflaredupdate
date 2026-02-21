@@ -3,8 +3,7 @@
 # shellcheck source=/dev/null
 #
 # A script to automagically update cloudlfared on Synology NAS from the builds at
-# https://github.com/karasevm/syno-cloudflared-builds. These builds are eventually published in the
-# SynoCommunity Package Center but this script allows for more frequent updates.
+# https://github.com/paulgit/syno-cloudflared-builds. 
 #
 # This must be run as root to natively control running services
 #
@@ -17,7 +16,7 @@
 # bash /volume1/homes/admin/scripts/bash/syno.cloudflaredupdate.sh
 
 # Script version
-SCRIPT_VERSION=0.1.0
+SCRIPT_VERSION=0.2.0
 MIN_DSM_VERSION=7.2
 
 # Obtain script path info
@@ -321,7 +320,7 @@ main() {
   fi
 
   # Obtain GitHub website for latest cloudflared build info
-  package_repo=karasevm/syno-cloudflared-builds
+  package_repo=paulgit/syno-cloudflared-builds
 
   # Fetch the latest releases from the GitHub API
   package_releases=$(curl -s "https://api.github.com/repos/$package_repo/releases")
